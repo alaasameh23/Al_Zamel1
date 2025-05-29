@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <link rel="icon" href="assets/engineering-helmet_18031478.png" />
+  <title>حركة الخزينة</title>
+  <style>
+    @media screen and (max-width: 768px) {
+  /* تحويل الشريط الجانبي (sidebar) إلى شريط أفقي أعلى */
+  .sidebar {
+    position: fixed;
+    top: 70px;
+    left: 0;
+    width: 100%;
+    height: auto;
+    display: flex;
+    overflow-x: auto;
+    padding: 5px 0;
+    background: #1a3b7c;
+    z-index: 1000;
+  }
+
+  .sidebar ul {
+    display: flex;
+    flex-wrap: nowrap;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+  }
+
+  .sidebar ul li {
+    display: inline-block;
+    flex: 0 0 auto;
+  }
+
+  .sidebar ul li a {
+    padding: 10px 15px;
+    border-left: none;
+    border-bottom: 3px solid transparent;
+  }
+
+  .sidebar ul li a.active,
+  .sidebar ul li a:hover {
+    background-color: transparent;
+    border-left: none;
+    border-bottom-color: #aac4ff;
+  }
+
+  /* إزالة الهامش اليمين من المحتوى الرئيسي وتعويضه بمساحة أعلى */
+  main {
+    margin: 0;
+    margin-top: 120px; /* لتحتوي مساحة الشريط الجانبي الأفقي */
+    padding: 20px 15px;
+    min-height: calc(100vh - 120px);
+  }
+
+  /* تغيير تنسيق ترويسة الصفحة عند الشاشات الصغيرة */
+  header {
+    flex-wrap: wrap;
+    padding: 15px 10px;
+  }
+
+  header nav {
+    position: static;
+    transform: none;
+    left: auto;
+    top: auto;
+    margin-bottom: 10px;
+    justify-content: center;
+    width: 100%;
+  }
+
+  header h1 {
+    font-size: 22px;
+  }
+}
+
+    @import url('https://fonts.googleapis.com/css2?family=Cairo&display=swap');
+    body {
+      font-family: 'Cairo', sans-serif;
+      margin: 0;
+      background: #f5f9ff;
+      display: flex;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    aside {
+      width: 220px;
+      background-color: #013a63;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      box-sizing: border-box;
+      position: fixed;
+      top: 0; bottom: 0; right: 0;
+    }
+    aside h2 {
+      margin: 0 0 20px;
+      font-weight: 700;
+      font-size: 1.6rem;
+      border-bottom: 2px solid #0bb;
+      padding-bottom: 10px;
+    }
+    aside nav {
+      display: flex;
+      flex-direction: column;
+    }
+    aside nav a, 
+    aside nav .dropdown-btn {
+      color: #a7d3f7;
+      text-decoration: none;
+      margin-bottom: 15px;
+      font-size: 1.1rem;
+      transition: color 0.3s;
+      display: block;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      user-select: none;
+      position: relative;
+    }
+    aside nav a:hover, 
+    aside nav .dropdown-btn:hover {
+      color: #fff;
+      background: #0bb;
+    }
+
+    aside nav .dropdown-btn::after {
+      content: "▼";
+      font-size: 0.7rem;
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      transition: transform 0.3s ease;
+    }
+    aside nav .dropdown-btn.active::after {
+      transform: translateY(-50%) rotate(180deg);
+    }
+    aside nav .dropdown-content {
+      display: none;
+      flex-direction: column;
+      margin-bottom: 15px;
+      padding-left: 15px;
+    }
+    aside nav .dropdown-content a {
+      margin-bottom: 10px;
+      font-size: 1rem;
+      padding: 6px 12px;
+      color: #bbe1ff;
+      border-radius: 6px;
+    }
+    aside nav .dropdown-content a:hover {
+      color: #fff;
+      background: #0984e3;
+    }
+    aside nav .dropdown-btn:hover + .dropdown-content,
+    aside nav .dropdown-content:hover {
+      display: flex;
+    }
+    main {
+      margin-right: 220px;
+      padding: 20px 30px;
+      flex: 1;
+    }
+    header {
+      font-size: 1.8rem;
+      margin-bottom: 20px;
+      color: #013a63;
+      font-weight: 700;
+      text-align: center;
+      border-bottom: 2px solid #0bb;
+      padding-bottom: 10px;
+    }
+    form {
+      background: #fff;
+      padding: 15px 20px;
+      border-radius: 10px;
+      box-shadow: 0 3px 8px rgb(1 58 99 / 0.15);
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 15px;
+      margin-bottom: 30px;
+      align-items: center;
+    }
+    form label {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: #013a63;
+    }
+    form input, form select, form textarea {
+      padding: 8px 10px;
+      font-size: 1rem;
+      border: 1.5px solid #a3c1e0;
+      border-radius: 8px;
+      outline-color: #0bb;
+      width: 100%;
+      box-sizing: border-box;
+      font-family: 'Cairo', sans-serif;
+    }
+    form textarea {
+      resize: vertical;
+      min-height: 38px;
+    }
+    form button {
+      background-color: #0bb;
+      border: none;
+      color: #fff;
+      font-weight: 700;
+      font-size: 1rem;
+      border-radius: 8px;
+      padding: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      grid-column: 6 / 7;
+      justify-self: center;
+      align-self: end;
+    }
+    form button:hover {
+      background-color: #0973a3;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      box-shadow: 0 3px 8px rgb(1 58 99 / 0.15);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    thead {
+      background-color: #013a63;
+      color: #fff;
+    }
+    th, td {
+      padding: 14px 10px;
+      text-align: center;
+      font-size: 1rem;
+      border-bottom: 1px solid #e3e8f1;
+      max-width: 160px;
+      word-wrap: break-word;
+    }
+    tbody tr:hover {
+      background-color: #e6f0ff;
+    }
+    button.action-btn {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      color: #0bb;
+      font-weight: 700;
+      font-size: 1.2rem;
+      margin: 0 5px;
+      transition: color 0.3s;
+    }
+    button.action-btn:hover {
+      color: #0973a3;
+    }
+    /* Modal */
+    .modal {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .modal.active {
+      display: flex;
+    }
+    .modal-content {
+      background: #fff;
+      border-radius: 12px;
+      padding: 30px;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 3px 15px rgb(1 58 99 / 0.3);
+      font-family: 'Cairo', sans-serif;
+      position: relative;
+    }
+    .modal-content h3 {
+      margin-top: 0;
+      color: #013a63;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .modal-content label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #013a63;
+    }
+    .modal-content input, .modal-content select, .modal-content textarea {
+      width: 100%;
+      padding: 8px 10px;
+      margin-bottom: 15px;
+      font-size: 1rem;
+      border: 1.5px solid #a3c1e0;
+      border-radius: 8px;
+      outline-color: #0bb;
+      box-sizing: border-box;
+      font-family: 'Cairo', sans-serif;
+    }
+    .modal-content textarea {
+      resize: vertical;
+      min-height: 60px;
+    }
+    .modal-content button {
+      width: 100%;
+      padding: 10px;
+      background-color: #0bb;
+      border: none;
+      color: white;
+      font-weight: 700;
+      font-size: 1.1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    .modal-content button:hover {
+      background-color: #0973a3;
+    }
+    .modal-close {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      background: #f44336;
+      border: none;
+      color: #fff;
+      font-weight: 700;
+      font-size: 1rem;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      line-height: 1;
+      text-align: center;
+      padding: 0;
+    }
+    /* Message Box */
+    #messageBox {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      background-color: #0bb;
+      color: white;
+      font-weight: 700;
+      padding: 18px 30px;
+      border-radius: 10px;
+      box-shadow: 0 3px 12px rgb(1 58 99 / 0.6);
+      z-index: 2000;
+      transition: transform 0.3s ease;
+      user-select: none;
+      text-align: center;
+      font-family: 'Cairo', sans-serif;
+    }
+    #messageBox.show {
+      transform: translate(-50%, -50%) scale(1);
+    }
+    /* Responsive */
+    @media (max-width: 768px) {
+      aside {
+        position: relative;
+        width: 100%;
+        height: auto;
+        padding: 10px 20px;
+      }
+      main {
+        margin: 0;
+      }
+      form {
+        grid-template-columns: 1fr 1fr;
+      }
+      form button {
+        grid-column: 1 / 3;
+        justify-self: stretch;
+      }
+      table thead {
+        display: none;
+      }
+      table, tbody, tr, td {
+        display: block;
+        width: 100%;
+      }
+      tr {
+        margin-bottom: 15px;
+        border-bottom: 2px solid #0bb;
+      }
+      td {
+        text-align: right;
+        padding-left: 50%;
+        position: relative;
+        border: none;
+        font-size: 0.9rem;
+      }
+      td::before {
+        position: absolute;
+        top: 14px;
+        right: 10px;
+        width: 45%;
+        white-space: nowrap;
+        font-weight: 700;
+        color: #013a63;
+      }
+      td:nth-of-type(1)::before { content: "اسم الموظف"; }
+      td:nth-of-type(2)::before { content: "التاريخ"; }
+      td:nth-of-type(3)::before { content: "نوع الحركة"; }
+      td:nth-of-type(4)::before { content: "خرجت الأموال من"; }
+      td:nth-of-type(5)::before { content: "أدخلت الأموال من"; }
+      td:nth-of-type(6)::before { content: "تفاصيل إضافية"; }
+      td:nth-of-type(7)::before { content: "تحكم"; }
+    }
+  </style>
+</head>
+<body>
+  <aside>
+    <h2>الزامل</h2>
+    <nav>
+      <a href="index.html">الرئيسية</a>
+      <a href="The covenant.html">العهدة</a>
+      <div class="dropdown">
+        <div tabindex="0" class="dropdown-btn" aria-haspopup="true" aria-expanded="false">الحسابات</div>
+        <div class="dropdown-content" role="menu" aria-label="قائمة الخيارات">
+          <a href="insert.html" role="menuitem">حسابات الميناء</a>
+          <a href="quarry-accounts.html" role="menuitem">حسابات المحاجر</a>
+        </div>
+      </div>
+      <a href="Salaries.html">المرتبات</a>
+      <a href="Treasury movement.html">حركة الخزينة</a>
+      <a href="settings.html">الإعدادات</a>
+    </nav>
+  </aside>
+  <main>
+    <header>حركة الخزينة</header>
+    <form id="covenantForm" aria-label="نموذج إضافة حركة خزينة">
+      <label for="employeeName">اسم الموظف:</label>
+      <input type="text" id="employeeName" required autocomplete="off" />
+
+      <label for="movementDate">التاريخ:</label>
+      <input type="date" id="movementDate" required />
+
+      <label for="moveType">نوع الحركة:</label>
+      <select id="moveType" required>
+        <option value="" disabled selected>اختر نوع الحركة</option>
+        <option value="سحب">سحب</option>
+        <option value="إيداع">إيداع</option>
+        <option value="تحويل">تحويل</option>
+      </select>
+
+      <label for="moneyOutFrom">خرجت الأموال من:</label>
+      <input type="text" id="moneyOutFrom" required autocomplete="off" />
+
+      <label for="moneyInFrom">أدخلت الأموال من:</label>
+      <input type="text" id="moneyInFrom" required autocomplete="off" />
+
+      <label for="extraDetails">التفاصيل الإضافية:</label>
+      <textarea id="extraDetails" placeholder="تفاصيل إضافية..." rows="1"></textarea>
+
+      <button type="submit">أضف</button>
+<div class="export-buttons">
+  <button id="exportExcelBtn" type="button">تصدير إلى Excel</button>
+  <button id="exportPdfBtn" type="button">تصدير إلى PDF</button>
+</div>
+    </form>
+
+    <table id="covenantTable" aria-label="جدول حركة الخزينة">
+      <thead>
+        <tr>
+          <th>اسم الموظف</th>
+          <th>التاريخ</th>
+          <th>نوع الحركة</th>
+          <th>خرجت الأموال من</th>
+          <th>أدخلت الأموال من</th>
+          <th>تفاصيل إضافية</th>
+          <th>تحكم</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- البيانات ستضاف هنا ديناميكياً -->
+      </tbody>
+    </table>
+  </main>
+
+  <div id="messageBox" role="alert" aria-live="assertive">تم الحفظ بنجاح</div>
+
+  <script>
+    // إعدادات Firebase (استبدلها بالقيم الخاصة بك)
+const firebaseConfig = {
+  apiKey: "AIzaSyAstL7SQukxHMOEshWXQEuM9Ju9n7UK8TI",
+  authDomain: "lqa2ed.firebaseapp.com",
+  databaseURL: "https://lqa2ed-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "lqa2ed",
+  storageBucket: "lqa2ed.firebasestorage.app",
+  messagingSenderId: "677918048293",
+  appId: "1:677918048293:web:9644eab33e4f2df044ffcc"
+};
+
+
+    // تهيئة Firebase
+    firebase.initializeApp(firebaseConfig);
+
+    // تهيئة Firestore
+    const db = firebase.firestore();
+
+    const form = document.getElementById('covenantForm');
+    const tableBody = document.querySelector('#covenantTable tbody');
+    const messageBox = document.getElementById('messageBox');
+
+    // دالة لإظهار رسالة مؤقتة
+    function showMessage(msg = "تم الحفظ بنجاح") {
+      messageBox.textContent = msg;
+      messageBox.classList.add('show');
+      setTimeout(() => {
+        messageBox.classList.remove('show');
+      }, 2000);
+    }
+
+    // دالة لإضافة سجل جديد إلى Firestore
+    function addData(data) {
+      return db.collection("treasuryMovements").add({
+        employeeName: data.employeeName,
+        movementDate: data.movementDate,
+        moveType: data.moveType,
+        moneyOutFrom: data.moneyOutFrom,
+        moneyInFrom: data.moneyInFrom,
+        extraDetails: data.extraDetails || "",
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    }
+
+    // دالة لعرض البيانات من Firestore في الجدول
+    function loadData() {
+      tableBody.innerHTML = "";
+      db.collection("treasuryMovements").orderBy("timestamp", "desc").get()
+        .then(snapshot => {
+          snapshot.forEach(doc => {
+            const data = doc.data();
+            const tr = document.createElement("tr");
+
+            tr.innerHTML = `
+              <td>${data.employeeName || ""}</td>
+              <td>${data.movementDate || ""}</td>
+              <td>${data.moveType || ""}</td>
+              <td>${data.moneyOutFrom || ""}</td>
+              <td>${data.moneyInFrom || ""}</td>
+              <td>${data.extraDetails || ""}</td>
+              <td>
+                <!-- يمكنك إضافة أزرار تحكم هنا لاحقًا -->
+                -
+              </td>
+            `;
+            tableBody.appendChild(tr);
+          });
+        })
+        .catch(error => {
+          alert("حدث خطأ أثناء تحميل البيانات: " + error.message);
+          console.error(error);
+        });
+    }
+
+    // حدث إرسال النموذج
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+
+      const data = {
+        employeeName: document.getElementById('employeeName').value.trim(),
+        movementDate: document.getElementById('movementDate').value,
+        moveType: document.getElementById('moveType').value,
+        moneyOutFrom: document.getElementById('moneyOutFrom').value.trim(),
+        moneyInFrom: document.getElementById('moneyInFrom').value.trim(),
+        extraDetails: document.getElementById('extraDetails').value.trim()
+      };
+
+      // تحقق من تعبئة الحقول المطلوبة
+      if (!data.employeeName || !data.movementDate || !data.moveType || !data.moneyOutFrom || !data.moneyInFrom) {
+        alert("من فضلك اكمل كل الحقول المطلوبة");
+        return;
+      }
+
+      addData(data)
+        .then(() => {
+          showMessage("تم إضافة البيانات بنجاح!");
+          form.reset();
+          loadData();
+        })
+        .catch(error => {
+          alert("حدث خطأ أثناء الإضافة: " + error.message);
+          console.error(error);
+        });
+    });
+
+    // تحميل البيانات عند بداية الصفحة
+    window.onload = loadData;
+      // تصدير جدول البيانات إلى Excel
+document.getElementById('exportExcelBtn').addEventListener('click', () => {
+  const wb = XLSX.utils.book_new();
+  const table = document.querySelector('table');
+  const ws = XLSX.utils.table_to_sheet(table);
+  XLSX.utils.book_append_sheet(wb, ws, "البيانات");
+  XLSX.writeFile(wb, "portAccounts.xlsx");
+});
+
+// تصدير جدول البيانات إلى PDF
+document.getElementById('exportPdfBtn').addEventListener('click', () => {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF('p', 'pt', 'a4');
+
+  // الحصول على رأس الجدول والبيانات من tbody
+  const headers = [];
+  document.querySelectorAll('table thead th').forEach(th => headers.push(th.innerText));
+
+  const data = [];
+  document.querySelectorAll('#tableBody tr').forEach(tr => {
+    const rowData = [];
+    tr.querySelectorAll('td').forEach(td => rowData.push(td.innerText));
+    data.push(rowData);
+  });
+
+  doc.autoTable({
+    head: [headers],
+    body: data,
+    styles: { font: 'helvetica', fontSize: 9 },
+    headStyles: { fillColor: [21, 54, 133] }, // لون أزرق للرأس
+    theme: 'grid',
+    startY: 20,
+  });
+
+  doc.save('portAccounts.pdf');
+});
+  </script>
+  <style>
+.export-buttons {
+  display: flex;
+  gap: 10px; /* مسافة بين الأزرار */
+  justify-content: center;
+  align-items: center;
+  grid-column: 6 / 7; /* يضمن بقاءهم في عمود زر الإضافة */
+}
+
+/* تنسيق مشترك لأزرار التصدير */
+.export-buttons button {
+  background-color: #0bb;
+  border: none;
+  color: #fff;
+  font-weight: 700;
+  font-size: 1rem;
+  border-radius: 8px;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+/* تأثير hover */
+.export-buttons button:hover {
+  background-color: #0973a3;
+  transform: scale(1.05);
+}
+
+    #messageBox {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      background-color: #0bb;
+      color: white;
+      font-weight: 700;
+      padding: 18px 30px;
+      border-radius: 10px;
+      box-shadow: 0 3px 12px rgb(1 58 99 / 0.6);
+      z-index: 2000;
+      transition: transform 0.3s ease;
+      user-select: none;
+      text-align: center;
+      font-family: 'Cairo', sans-serif;
+    }
+    #messageBox.show {
+      transform: translate(-50%, -50%) scale(1);
+    }
+    
+  </style>
+</body>
+</html>

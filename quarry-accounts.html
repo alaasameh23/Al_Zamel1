@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+  <link rel="icon" href="assets/engineering-helmet_18031478.png" />
+  <title>حسابات المحاجر</title>
+  <style>
+    /* الخط العام */
+    @import url('https://fonts.googleapis.com/css2?family=Cairo&display=swap');
+    @media screen and (max-width: 768px) {
+  /* تحويل الشريط الجانبي (sidebar) إلى شريط أفقي أعلى */
+  .sidebar {
+    position: fixed;
+    top: 70px;
+    left: 0;
+    width: 100%;
+    height: auto;
+    display: flex;
+    overflow-x: auto;
+    padding: 5px 0;
+    background: #1a3b7c;
+    z-index: 1000;
+  }
+
+  .sidebar ul {
+    display: flex;
+    flex-wrap: nowrap;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+  }
+
+  .sidebar ul li {
+    display: inline-block;
+    flex: 0 0 auto;
+  }
+
+  .sidebar ul li a {
+    padding: 10px 15px;
+    border-left: none;
+    border-bottom: 3px solid transparent;
+  }
+
+  .sidebar ul li a.active,
+  .sidebar ul li a:hover {
+    background-color: transparent;
+    border-left: none;
+    border-bottom-color: #aac4ff;
+  }
+
+  /* إزالة الهامش اليمين من المحتوى الرئيسي وتعويضه بمساحة أعلى */
+  main {
+    margin: 0;
+    margin-top: 120px; /* لتحتوي مساحة الشريط الجانبي الأفقي */
+    padding: 20px 15px;
+    min-height: calc(100vh - 120px);
+  }
+
+  /* تغيير تنسيق ترويسة الصفحة عند الشاشات الصغيرة */
+  header {
+    flex-wrap: wrap;
+    padding: 15px 10px;
+  }
+
+  header nav {
+    position: static;
+    transform: none;
+    left: auto;
+    top: auto;
+    margin-bottom: 10px;
+    justify-content: center;
+    width: 100%;
+  }
+
+  header h1 {
+    font-size: 22px;
+  }
+}
+
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: #e7f0ff;
+      color: #0b2d70;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    header {
+      background-color: #144a99;
+      padding: 20px;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      user-select: none;
+    }
+
+    header nav {
+      position: absolute;
+      left: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      gap: 15px;
+    }
+
+    header nav a {
+      color: white;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.3s;
+      cursor: pointer;
+    }
+
+    header nav a:hover {
+      color: #85aaff;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 28px;
+      font-weight: 700;
+    }
+
+    .sidebar {
+      width: 210px;
+      background: #1a3b7c;
+      color: white;
+      padding-top: 30px;
+      position: fixed;
+      top: 70px;
+      bottom: 0;
+      overflow-y: auto;
+    }
+
+    .sidebar ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .sidebar ul li {
+      position: relative;
+    }
+
+    .sidebar ul li a {
+      color: white;
+      display: block;
+      padding: 15px 25px;
+      text-decoration: none;
+      font-weight: 600;
+      border-left: 4px solid transparent;
+      transition: background-color 0.3s, border-left-color 0.3s;
+      cursor: pointer;
+    }
+
+    .sidebar ul li a.active,
+    .sidebar ul li a:hover {
+      background-color: #2a509b;
+      border-left-color: #aac4ff;
+    }
+
+    /* المحتوى الرئيسي */
+    .content {
+      flex: 1;
+      margin-right: 210px; /* يترك مساحة للـ sidebar */
+      padding: 25px 40px;
+      background-color: #f4f6f8;
+      min-height: 100vh;
+      box-sizing: border-box;
+    }
+
+    .content h1 {
+      margin-bottom: 25px;
+      color: #144a99;
+      font-weight: 700;
+      font-size: 28px;
+    }
+
+    /* نموذج الإدخال */
+    form {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 15px;
+      margin-bottom: 30px;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+    }
+
+    input[type="text"],
+    input[type="date"],
+    input[type="number"] {
+      padding: 10px 12px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 16px;
+      transition: border-color 0.3s ease;
+    }
+
+    input[type="text"]:focus,
+    input[type="date"]:focus,
+    input[type="number"]:focus {
+      outline: none;
+      border-color: #007bff;
+      box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+    }
+
+    input[readonly] {
+      background-color: #e9ecef;
+      cursor: not-allowed;
+    }
+
+    button {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 6px;
+      background-color: #007bff;
+      color: white;
+      font-weight: 700;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      grid-column: span 1;
+      justify-self: start;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    /* بحث */
+    #searchInput {
+      width: 100%;
+      padding: 12px 15px;
+      font-size: 16px;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      box-sizing: border-box;
+    }
+
+    /* جدول البيانات */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+    }
+
+    thead tr {
+      background-color: #007bff;
+      color: white;
+      font-weight: 700;
+    }
+
+    th, td {
+      padding: 10px 12px;
+      border: 1px solid #ddd;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    .actions button {
+      margin: 2px 5px;
+      padding: 6px 10px;
+      font-size: 13px;
+      border-radius: 5px;
+      border: none;
+      cursor: pointer;
+      color: white;
+      background-color: #dc3545; /* احمر للحذف */
+      transition: background-color 0.3s ease;
+    }
+
+    .actions button:hover {
+      background-color: #a71d2a;
+    }
+
+    .actions button:nth-child(2) {
+      background-color: #28a745; /* أخضر للتعديل */
+    }
+
+    .actions button:nth-child(2):hover {
+      background-color: #19692c;
+    }
+
+    .dropdown > a::after {
+      content: " ▾";
+      font-size: 14px;
+      margin-left: 6px;
+    }
+
+    /* القائمة الفرعية مخفية افتراضياً */
+    .submenu {
+      display: none;
+      list-style: none;
+      padding-left: 0;
+      margin: 0;
+      background-color: #2a509b;
+    }
+
+    .submenu li a {
+      padding: 12px 25px;
+      font-weight: normal;
+      border-left: 4px solid transparent;
+      color: white;
+      display: block;
+      text-decoration: none;
+      transition: background-color 0.3s, border-left-color 0.3s;
+    }
+
+    .submenu li a:hover {
+      background-color: #aac4ff;
+      color: #0b2d70;
+      border-left-color: #0b2d70;
+    }
+
+    /* عند تفعيل القائمة الفرعية تظهر */
+    .dropdown.open > .submenu {
+      display: block;
+    }
+    #messageBox {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: #144a99;
+      color: white;
+      padding: 15px 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+      font-size: 18px;
+      font-weight: 600;
+      z-index: 1000;
+      text-align: center;
+      min-width: 250px;
+    }
+
+  </style>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+</head>
+<body>
+  <div id="messageBox" style="display:none;"></div>
+
+  <div class="sidebar">
+    <ul>
+      <li><a href="index.html">الرئيسية</a></li>
+      <li><a href="The covenant.html">العهدة</a></li>
+      <li class="dropdown">
+        <a href="#">حسابات</a>
+        <ul class="submenu">
+          <li><a href="insert.html" class="active">حسابات الميناء</a></li>
+          <li><a href="quarry-accounts.html">حسابات المحاجر</a></li>
+        </ul>
+      </li>
+      <li><a href="Salaries.html">المرتبات</a></li>
+      <li><a href="Treasury movement.html">حركة الخزينة</a></li>
+      <li><a href="settings.html">الإعدادات</a></li>
+    </ul>
+  </div>
+
+  <!-- header -->
+  <header>
+    <nav>
+      <a href="acc.html" style="color:white; font-weight:600; text-decoration:none;">حسابي</a>
+      <a href="login.html" id="logoutBtn">تسجيل الخروج</a>
+    </nav>
+    <h1>الزامل</h1>
+  </header>
+
+  <!-- main content -->
+  <div class="content">
+    <h1>حسابات المحاجر</h1>
+    <form id="dataForm">
+      <input type="text" placeholder="م" id="num" name="num" />
+      <input type="date" id="date" name="date" />
+      <input type="text" placeholder="العربية" id="truck" name="truck" />
+      <input type="text" placeholder="رقم الإيصال" id="receipt" name="receipt" />
+      <input type="text" placeholder="رقم الميزان" id="scale" name="scale" />
+      <input type="text" placeholder="المقاول / المحجر" id="contractor" name="contractor" />
+      <input type="text" placeholder="الأسبوع" id="week" name="week" />
+      <input type="number" step="0.01" placeholder="تكعيب المحجر" id="quarryVol" name="quarryVol" />
+      <input type="number" step="0.01" placeholder="تكعيب الموقع" id="siteVol" name="siteVol" />
+      <input type="number" step="0.01" placeholder="خصم الحمولة" id="loadDeduct" name="loadDeduct" />
+      <input type="number" step="0.01" placeholder="خصم سوء النوع" id="qualityDeduct" name="qualityDeduct" />
+      <input type="number" step="0.01" placeholder="سعر الشركة" id="price" name="price" />
+      <input type="number" placeholder="عدد" id="count" name="count" />
+      <input type="text" placeholder="صافي الكمية" id="netQty" readonly name="netQty" />
+      <input type="text" placeholder="المستحق لنا" id="totalDue" readonly name="totalDue" />
+      <button type="submit">إضافة</button>
+      <button id="exportExcelBtn">تصدير إلى Excel</button>
+      <button id="exportPdfBtn">تصدير إلى PDF</button>
+    </form>
+
+    <input type="text" id="searchInput" placeholder="بحث برقم الايصال..." />
+
+    <table>
+      <thead>
+        <tr>
+          <th>م</th>
+          <th>التاريخ</th>
+          <th>العربية</th>
+          <th>رقم الإيصال</th>
+          <th>رقم الميزان</th>
+          <th>المقاول / المحجر</th>
+          <th>الأسبوع</th>
+          <th>تكعيب المحجر</th>
+          <th>تكعيب الموقع</th>
+          <th>خصم الحمولة</th>
+          <th>خصم سوء النوع</th>
+          <th>سعر الشركة</th>
+          <th>عدد</th>
+          <th>صافي الكمية</th>
+          <th>المستحق لنا</th>
+          <th>العمليات</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody">
+        <!-- البيانات ستضاف هنا -->
+      </tbody>
+    </table>
+  </div>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyAstL7SQukxHMOEshWXQEuM9Ju9n7UK8TI",
+  authDomain: "lqa2ed.firebaseapp.com",
+  databaseURL: "https://lqa2ed-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "lqa2ed",
+  storageBucket: "lqa2ed.firebasestorage.app",
+  messagingSenderId: "677918048293",
+  appId: "1:677918048293:web:9644eab33e4f2df044ffcc"
+};
+
+  // تهيئة Firebase
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
+  // دالة تحديث صافي الكمية والمستحق
+  function updateCalculatedFields() {
+    const quarryVol = parseFloat(document.getElementById('quarryVol').value) || 0;
+    const siteVol = parseFloat(document.getElementById('siteVol').value) || 0;
+    const loadDeduct = parseFloat(document.getElementById('loadDeduct').value) || 0;
+    const qualityDeduct = parseFloat(document.getElementById('qualityDeduct').value) || 0;
+    const price = parseFloat(document.getElementById('price').value) || 0;
+    const count = parseInt(document.getElementById('count').value) || 0;
+
+    const netQty = siteVol - loadDeduct - qualityDeduct;
+    document.getElementById('netQty').value = netQty.toFixed(2);
+
+    const totalDue = netQty * price * count;
+    document.getElementById('totalDue').value = totalDue.toFixed(2);
+  }
+
+  // ربط الاستماع للأحداث لتحديث الحقول تلقائياً
+  ['quarryVol', 'siteVol', 'loadDeduct', 'qualityDeduct', 'price', 'count'].forEach(id => {
+    document.getElementById(id).addEventListener('input', updateCalculatedFields);
+  });
+
+  // استدعاء التحديث عند تحميل الصفحة
+  window.addEventListener('DOMContentLoaded', updateCalculatedFields);
+
+  // إضافة بيانات إلى Firebase وعرضها في الجدول
+  const dataForm = document.getElementById('dataForm');
+  const tableBody = document.getElementById('tableBody');
+  const messageBox = document.getElementById('messageBox');
+
+  function showMessage(message) {
+    messageBox.textContent = message;
+    messageBox.style.display = 'block';
+    setTimeout(() => {
+      messageBox.style.display = 'none';
+    }, 3000);
+  }
+
+  function addRowToTable(doc) {
+    const data = doc.data();
+    const tr = document.createElement('tr');
+
+    // محتويات الصف
+    tr.innerHTML = `
+      <td>${data.num}</td>
+      <td>${data.date}</td>
+      <td>${data.truck}</td>
+      <td>${data.receipt}</td>
+      <td>${data.scale}</td>
+      <td>${data.contractor}</td>
+      <td>${data.week}</td>
+      <td>${data.quarryVol}</td>
+      <td>${data.siteVol}</td>
+      <td>${data.loadDeduct}</td>
+      <td>${data.qualityDeduct}</td>
+      <td>${data.price}</td>
+      <td>${data.count}</td>
+      <td>${data.netQty}</td>
+      <td>${data.totalDue}</td>
+      <td class="actions">
+        <button onclick="deleteRow('${doc.id}')">حذف</button>
+        <button onclick="editRow('${doc.id}')">تعديل</button>
+      </td>
+    `;
+
+    tr.setAttribute('data-id', doc.id);
+    tableBody.appendChild(tr);
+  }
+
+  // تحميل البيانات من Firebase وعرضها
+  function loadData() {
+    tableBody.innerHTML = '';
+    db.collection('portAccounts').orderBy('num').get()
+      .then(snapshot => {
+        snapshot.forEach(doc => addRowToTable(doc));
+      })
+      .catch(err => {
+        console.error('خطأ في تحميل البيانات:', err);
+        showMessage('خطأ في تحميل البيانات.');
+      });
+  }
+
+  // حذف صف
+  function deleteRow(id) {
+    if (confirm('هل أنت متأكد من حذف هذا السجل؟')) {
+      db.collection('portAccounts').doc(id).delete()
+        .then(() => {
+          document.querySelector(`tr[data-id="${id}"]`).remove();
+          showMessage('تم الحذف بنجاح');
+        })
+        .catch(err => {
+          console.error('خطأ في الحذف:', err);
+          showMessage('خطأ في الحذف');
+        });
+    }
+  }
+
+  // تعديل صف - تبسيط: التحميل في النموذج ثم تحديث
+  let editMode = false;
+  let editId = null;
+
+  function editRow(id) {
+    db.collection('portAccounts').doc(id).get()
+      .then(doc => {
+        if (doc.exists) {
+          const data = doc.data();
+          document.getElementById('num').value = data.num;
+          document.getElementById('date').value = data.date;
+          document.getElementById('truck').value = data.truck;
+          document.getElementById('receipt').value = data.receipt;
+          document.getElementById('scale').value = data.scale;
+          document.getElementById('contractor').value = data.contractor;
+          document.getElementById('week').value = data.week;
+          document.getElementById('quarryVol').value = data.quarryVol;
+          document.getElementById('siteVol').value = data.siteVol;
+          document.getElementById('loadDeduct').value = data.loadDeduct;
+          document.getElementById('qualityDeduct').value = data.qualityDeduct;
+          document.getElementById('price').value = data.price;
+          document.getElementById('count').value = data.count;
+          updateCalculatedFields();
+
+          editMode = true;
+          editId = id;
+          dataForm.querySelector('button[type="submit"]').textContent = 'تحديث';
+        } else {
+          showMessage('السجل غير موجود');
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        showMessage('خطأ في تحميل السجل');
+      });
+  }
+
+  dataForm.addEventListener('submit', e => {
+    e.preventDefault();
+
+    // جمع البيانات من الحقول
+    const data = {
+      num: document.getElementById('num').value,
+      date: document.getElementById('date').value,
+      truck: document.getElementById('truck').value,
+      receipt: document.getElementById('receipt').value,
+      scale: document.getElementById('scale').value,
+      contractor: document.getElementById('contractor').value,
+      week: document.getElementById('week').value,
+      quarryVol: parseFloat(document.getElementById('quarryVol').value) || 0,
+      siteVol: parseFloat(document.getElementById('siteVol').value) || 0,
+      loadDeduct: parseFloat(document.getElementById('loadDeduct').value) || 0,
+      qualityDeduct: parseFloat(document.getElementById('qualityDeduct').value) || 0,
+      price: parseFloat(document.getElementById('price').value) || 0,
+      count: parseInt(document.getElementById('count').value) || 0,
+      netQty: parseFloat(document.getElementById('netQty').value) || 0,
+      totalDue: parseFloat(document.getElementById('totalDue').value) || 0,
+    };
+
+    if (!data.num || !data.date) {
+      showMessage('يرجى تعبئة الحقول الأساسية');
+      return;
+    }
+
+    if (editMode) {
+      // تحديث السجل
+      db.collection('portAccounts').doc(editId).set(data)
+        .then(() => {
+          showMessage('تم التحديث بنجاح');
+          dataForm.reset();
+          updateCalculatedFields();
+          editMode = false;
+          editId = null;
+          dataForm.querySelector('button[type="submit"]').textContent = 'إضافة';
+          loadData();
+        })
+        .catch(err => {
+          console.error(err);
+          showMessage('خطأ في التحديث');
+        });
+    } else {
+      // إضافة سجل جديد
+      db.collection('portAccounts').add(data)
+        .then(() => {
+          showMessage('تم الإضافة بنجاح');
+          dataForm.reset();
+          updateCalculatedFields();
+          loadData();
+        })
+        .catch(err => {
+          console.error(err);
+          showMessage('خطأ في الإضافة');
+        });
+    }
+  });
+
+  // وظيفة البحث في الجدول
+  document.getElementById('searchInput').addEventListener('input', function() {
+    const searchTerm = this.value.trim().toLowerCase();
+    const rows = tableBody.querySelectorAll('tr');
+    rows.forEach(row => {
+      const text = row.textContent.toLowerCase();
+      row.style.display = text.includes(searchTerm) ? '' : 'none';
+    });
+  });
+
+  // عند تحميل الصفحة
+  window.addEventListener('DOMContentLoaded', () => {
+    updateCalculatedFields();
+    loadData();
+  });
+
+  // تفعيل القائمة المنسدلة الجانبية
+  document.querySelectorAll('.dropdown > a').forEach(el => {
+    el.addEventListener('click', e => {
+      e.preventDefault();
+      const parent = el.parentElement;
+      parent.classList.toggle('open');
+    });
+  });
+  // تصدير جدول البيانات إلى Excel
+document.getElementById('exportExcelBtn').addEventListener('click', () => {
+  const wb = XLSX.utils.book_new();
+  const table = document.querySelector('table');
+  const ws = XLSX.utils.table_to_sheet(table);
+  XLSX.utils.book_append_sheet(wb, ws, "البيانات");
+  XLSX.writeFile(wb, "portAccounts.xlsx");
+});
+
+// تصدير جدول البيانات إلى PDF
+document.getElementById('exportPdfBtn').addEventListener('click', () => {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF('p', 'pt', 'a4');
+
+  // الحصول على رأس الجدول والبيانات من tbody
+  const headers = [];
+  document.querySelectorAll('table thead th').forEach(th => headers.push(th.innerText));
+
+  const data = [];
+  document.querySelectorAll('#tableBody tr').forEach(tr => {
+    const rowData = [];
+    tr.querySelectorAll('td').forEach(td => rowData.push(td.innerText));
+    data.push(rowData);
+  });
+
+  doc.autoTable({
+    head: [headers],
+    body: data,
+    styles: { font: 'helvetica', fontSize: 9 },
+    headStyles: { fillColor: [21, 54, 133] }, // لون أزرق للرأس
+    theme: 'grid',
+    startY: 20,
+  });
+
+  doc.save('portAccounts.pdf');
+});
+
+
+</script>
+</body>
+</html>

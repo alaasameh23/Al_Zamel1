@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+
+  <link rel="icon" href="assets/engineering-helmet_18031478.png" />
+  <title>المرتبات - القائد</title>
+  <style>
+    @media screen and (max-width: 768px) {
+  /* تحويل الشريط الجانبي (sidebar) إلى شريط أفقي أعلى */
+  .sidebar {
+    position: fixed;
+    top: 70px;
+    left: 0;
+    width: 100%;
+    height: auto;
+    display: flex;
+    overflow-x: auto;
+    padding: 5px 0;
+    background: #1a3b7c;
+    z-index: 1000;
+  }
+
+  .sidebar ul {
+    display: flex;
+    flex-wrap: nowrap;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+  }
+
+  .sidebar ul li {
+    display: inline-block;
+    flex: 0 0 auto;
+  }
+
+  .sidebar ul li a {
+    padding: 10px 15px;
+    border-left: none;
+    border-bottom: 3px solid transparent;
+  }
+
+  .sidebar ul li a.active,
+  .sidebar ul li a:hover {
+    background-color: transparent;
+    border-left: none;
+    border-bottom-color: #aac4ff;
+  }
+
+  /* إزالة الهامش اليمين من المحتوى الرئيسي وتعويضه بمساحة أعلى */
+  main {
+    margin: 0;
+    margin-top: 120px; /* لتحتوي مساحة الشريط الجانبي الأفقي */
+    padding: 20px 15px;
+    min-height: calc(100vh - 120px);
+  }
+
+  /* تغيير تنسيق ترويسة الصفحة عند الشاشات الصغيرة */
+  header {
+    flex-wrap: wrap;
+    padding: 15px 10px;
+  }
+
+  header nav {
+    position: static;
+    transform: none;
+    left: auto;
+    top: auto;
+    margin-bottom: 10px;
+    justify-content: center;
+    width: 100%;
+  }
+
+  header h1 {
+    font-size: 22px;
+  }
+}
+
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: #e7f0ff;
+      color: #0b2d70;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+      header {
+      background-color: #144a99;
+      padding: 20px;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+
+    header nav {
+      position: absolute;
+      left: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      gap: 15px;
+    }
+
+    header nav a {
+      color: white;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.3s;
+      cursor: pointer;
+    }
+
+    header nav a:hover {
+      color: #85aaff;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 28px;
+      font-weight: 700;
+      user-select: none;
+    }
+
+    .sidebar {
+      width: 210px;
+      background: #1a3b7c;
+      color: white;
+      padding-top: 30px;
+      position: fixed;
+      top: 70px;
+      bottom: 0;
+      overflow-y: auto;
+      z-index: 10;
+    }
+
+    .sidebar ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .sidebar ul li a {
+      color: white;
+      display: block;
+      padding: 15px 25px;
+      text-decoration: none;
+      font-weight: 600;
+      border-left: 4px solid transparent;
+      transition: background-color 0.3s, border-left-color 0.3s;
+    }
+
+    .sidebar ul li a.active,
+    .sidebar ul li a:hover {
+      background-color: #2a509b;
+      border-left-color: #aac4ff;
+    }
+
+    main {
+      margin-right: 210px;
+      padding: 30px 40px;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+      min-width: 0; /* لمنع overflow */
+    }
+
+    .welcome {
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    /* نموذج الإضافة */
+    form#addSalaryForm {
+      background: white;
+      padding: 20px 30px;
+      border-radius: 8px;
+      box-shadow: 0 3px 9px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 15px 25px;
+      align-items: center;
+      position: relative;
+    }
+
+    form#addSalaryForm label {
+      font-weight: 600;
+      color: #0b2d70;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    form#addSalaryForm input[type="text"],
+    form#addSalaryForm input[type="number"],
+    form#addSalaryForm select {
+      width: 100%;
+      padding: 8px 10px;
+      font-size: 15px;
+      border: 1px solid #aac4ff;
+      border-radius: 5px;
+      outline-color: #144a99;
+      box-sizing: border-box;
+    }
+
+    /* مربع له زيادة؟ */
+    .extra-increase {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 600;
+      color: #0b2d70;
+      padding-top: 10px;
+    }
+    .extra-increase input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+
+    /* أزرار الإضافة والتعديل */
+    form#addSalaryForm button {
+      grid-column: 1 / -1;
+      background-color: #144a99;
+      color: white;
+      border: none;
+      padding: 12px 0;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 18px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    form#addSalaryForm button:hover {
+      background-color: #2a69d1;
+    }
+
+    form#addSalaryForm button.cancel-btn {
+      background-color: #c0392b;
+      margin-top: 0;
+    }
+    form#addSalaryForm button.cancel-btn:hover {
+      background-color: #e74c3c;
+    }
+
+    /* خانة البحث */
+    #searchInput {
+      padding: 10px 15px;
+      font-size: 16px;
+      width: 300px;
+      border-radius: 6px;
+      border: 1px solid #aac4ff;
+      outline-color: #144a99;
+      margin-bottom: 10px;
+      font-weight: 600;
+      color: #0b2d70;
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+
+    .table-header button:hover {
+      background: #144a99;
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      font-weight: 700;
+      cursor: pointer;
+      border-radius: 7px;
+      transition: background 0.3s ease;
+    }
+
+    .table-header h2 {
+      margin: 0;
+      font-weight: 700;
+      font-size: 22px;
+      color: #0b2d70;
+    }
+
+    .download-btn {
+      background-color: #144a99;
+      border: none;
+      color: white;
+      padding: 10px 18px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 16px;
+      transition: background-color 0.3s;
+      white-space: nowrap;
+    }
+
+    .download-btn:hover {
+      background-color: #2a69d1;
+    }
+
+    .table-container {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 3px 9px rgba(0, 0, 0, 0.1);
+      overflow-x: auto;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      min-width: 700px;
+      table-layout: auto;
+    }
+
+    th, td {
+      border: 1px solid #aac4ff;
+      padding: 12px 10px;
+      text-align: center;
+      font-weight: 600;
+      color: #144a99;
+      vertical-align: middle;
+    }
+
+    th {
+      background-color: #dbe6ff;
+    }
+
+    tbody tr:nth-child(even) {
+      background-color: #f3f7ff;
+    }
+
+    tbody tr:hover {
+      background-color: #e0ecff;
+    }
+
+    /* أزرار تعديل وحذف */
+    .action-btn {
+      background-color: #144a99;
+      border: none;
+      color: white;
+      padding: 6px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      margin: 0 3px;
+      transition: background-color 0.3s;
+    }
+    .action-btn.edit-btn:hover {
+      background-color: #2a69d1;
+    }
+    .action-btn.delete-btn {
+      background-color: #c0392b;
+    }
+    .action-btn.delete-btn:hover {
+      background-color: #e74c3c;
+    }
+
+    footer {
+      background-color: #144a99;
+      color: white;
+      text-align: center;
+      padding: 12px 0;
+      font-weight: 600;
+      margin-top: auto;
+    }
+
+    @media (max-width: 720px) {
+      main {
+        margin-right: 0;
+        padding: 20px;
+      }
+      .sidebar {
+        position: relative;
+        width: 100%;
+        height: auto;
+        top: 0;
+        z-index: 5;
+      }
+      form#addSalaryForm {
+        grid-template-columns: 1fr;
+        max-width: 100%;
+      }
+      #searchInput {
+        width: 100%;
+      }
+      table {
+        min-width: 0;
+        font-size: 14px;
+      }
+      th, td {
+        padding: 8px 6px;
+      }
+      .action-btn {
+        padding: 4px 7px;
+        font-size: 12px;
+      }
+    }
+        .dropdown > a::after {
+      content: " ▾";
+      font-size: 14px;
+      margin-left: 6px;
+    }
+
+    /* القائمة الفرعية مخفية افتراضياً */
+    .submenu {
+      display: none;
+      list-style: none;
+      padding-left: 0;
+      margin: 0;
+      background-color: #2a509b;
+    }
+
+    .submenu li a {
+      padding: 12px 25px;
+      font-weight: normal;
+      border-left: 4px solid transparent;
+      color: white;
+      display: block;
+      text-decoration: none;
+      transition: background-color 0.3s, border-left-color 0.3s;
+    }
+
+    .submenu li a:hover {
+      background-color: #aac4ff;
+      color: #0b2d70;
+      border-left-color: #0b2d70;
+    }
+
+    /* عند تفعيل القائمة الفرعية تظهر */
+    .dropdown.open > .submenu {
+      display: block;
+    }
+  </style>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <!-- أضف هذا في <head> لتحميل المكتبات الخارجية -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAstL7SQukxHMOEshWXQEuM9Ju9n7UK8TI",
+      authDomain: "lqa2ed.firebaseapp.com",
+      databaseURL: "https://lqa2ed-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "lqa2ed",
+      storageBucket: "lqa2ed.firebasestorage.app",
+      messagingSenderId: "677918048293",
+      appId: "1:677918048293:web:9644eab33e4f2df044ffcc"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    let editDocId = null; // لحفظ ID السجل أثناء التعديل
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadSalaries();
+    });
+
+    // تحميل بيانات المرتبات وعرضها
+    function loadSalaries(filterNumber = '') {
+      const tbody = document.getElementById('tableBody');
+      tbody.innerHTML = '<tr><td colspan="8">جارٍ تحميل البيانات...</td></tr>';
+
+      let query = db.collection('salaries').orderBy('employeeNumber', 'asc');
+      if (filterNumber) {
+        query = query.where('employeeNumber', '==', Number(filterNumber));
+      }
+
+      query.get().then(querySnapshot => {
+        let html = '';
+        let count = 0;
+        querySnapshot.forEach(doc => {
+          const d = doc.data();
+          count++;
+          html += `<tr>
+            <td>${count}</td>
+            <td>${d.employeeNumber || ''}</td>
+            <td>${d.employeeName || ''}</td>
+            <td>${d.position || ''}</td>
+            <td>${d.salaryAmount || ''}</td>
+            <td>${d.deductions || ''}</td>
+            <td>${d.netSalary || ''}</td>
+            <td>${d.extraIncrease ? 'نعم' : 'لا'}</td>
+            <td>
+              <button class="action-btn edit-btn" onclick="startEdit('${doc.id}')">تعديل</button>
+              <button class="action-btn delete-btn" onclick="deleteSalary('${doc.id}')">حذف</button>
+            </td>
+          </tr>`;
+        });
+
+        if (!html) html = '<tr><td colspan="9">لا توجد بيانات للعرض.</td></tr>';
+        tbody.innerHTML = html;
+      }).catch(error => {
+        tbody.innerHTML = `<tr><td colspan="9">حدث خطأ في تحميل البيانات: ${error.message}</td></tr>`;
+      });
+    }
+
+    // إضافة أو تعديل مرتب
+    function addOrUpdateSalary(event) {
+      event.preventDefault();
+
+      const employeeNumber = Number(document.getElementById('employeeNumber').value.trim());
+      const employeeName = document.getElementById('employeeName').value.trim();
+      const position = document.getElementById('position').value.trim();
+      const salaryAmount = Number(document.getElementById('salaryAmount').value.trim());
+      const deductions = Number(document.getElementById('deductions').value.trim());
+      const extraIncrease = document.getElementById('extraIncrease').checked;
+
+      if (!employeeNumber || !employeeName || !position || isNaN(salaryAmount) || isNaN(deductions)) {
+        alert('يرجى تعبئة جميع الحقول بشكل صحيح.');
+        return;
+      }
+
+      const netSalary = salaryAmount - deductions;
+
+      const data = {
+        employeeNumber,
+        employeeName,
+        position,
+        salaryAmount,
+        deductions,
+        netSalary,
+        extraIncrease
+      };
+
+      if (editDocId) {
+        // تعديل السجل
+        db.collection('salaries').doc(editDocId).set(data)
+          .then(() => {
+            alert('تم تعديل المرتب بنجاح.');
+            resetForm();
+            loadSalaries();
+          })
+          .catch(error => alert('حدث خطأ أثناء التعديل: ' + error.message));
+      } else {
+        // إضافة سجل جديد
+        db.collection('salaries').add(data)
+          .then(() => {
+            alert('تم إضافة المرتب بنجاح.');
+            resetForm();
+            loadSalaries();
+          })
+          .catch(error => alert('حدث خطأ أثناء الإضافة: ' + error.message));
+      }
+    }
+
+    // بدء تعديل مرتب - ملء الحقول بالبيانات
+    function startEdit(docId) {
+      db.collection('salaries').doc(docId).get().then(doc => {
+        if (doc.exists) {
+          const d = doc.data();
+          document.getElementById('employeeNumber').value = d.employeeNumber || '';
+          document.getElementById('employeeName').value = d.employeeName || '';
+          document.getElementById('position').value = d.position || '';
+          document.getElementById('salaryAmount').value = d.salaryAmount || '';
+          document.getElementById('deductions').value = d.deductions || '';
+          document.getElementById('extraIncrease').checked = d.extraIncrease || false;
+
+          document.getElementById('submitBtn').textContent = 'تعديل';
+          if (!document.getElementById('cancelEditBtn')) {
+            const cancelBtn = document.createElement('button');
+            cancelBtn.type = 'button';
+            cancelBtn.id = 'cancelEditBtn';
+            cancelBtn.textContent = 'إلغاء';
+            cancelBtn.className = 'cancel-btn';
+            cancelBtn.onclick = resetForm;
+            document.getElementById('addSalaryForm').appendChild(cancelBtn);
+          }
+          editDocId = docId;
+        } else {
+          alert('المرتبط غير موجود.');
+        }
+      }).catch(error => alert('حدث خطأ أثناء جلب البيانات: ' + error.message));
+    }
+
+    // حذف مرتب مع تأكيد
+function deleteSalary(docId) {
+  if (confirm('هل أنت متأكد أنك تريد حذف هذا المرتب؟ لن تتمكن من استعادته لاحقًا.')) {
+    db.collection('salaries').doc(docId).delete()
+      .then(() => {
+        alert('تم حذف المرتب بنجاح.');
+        loadSalaries();
+      })
+      .catch(error => alert('حدث خطأ أثناء الحذف: ' + error.message));
+  }
+}
+
+
+    // إعادة ضبط النموذج وحالة التعديل
+    function resetForm() {
+      document.getElementById('addSalaryForm').reset();
+      editDocId = null;
+      document.getElementById('submitBtn').textContent = 'إضافة';
+      const cancelBtn = document.getElementById('cancelEditBtn');
+      if (cancelBtn) cancelBtn.remove();
+    }
+
+    // البحث أثناء الكتابة
+    function searchSalaries() {
+      const val = document.getElementById('searchInput').value.trim();
+      if (val === '') {
+        loadSalaries();
+      } else {
+        if (!isNaN(val)) {
+          loadSalaries(val);
+        } else {
+          // بحث غير رقمي: يمكن تطويره لاحقًا
+          loadSalaries();
+        }
+      }
+    }
+    // تصدير جدول المرتبات إلى Excel
+function exportToExcel() {
+  const table = document.querySelector('table');
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.table_to_sheet(table);
+  XLSX.utils.book_append_sheet(wb, ws, "المرتبات");
+  XLSX.writeFile(wb, "المرتبات.xlsx");
+}
+
+// تصدير جدول المرتبات إلى PDF
+function exportToPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({
+    orientation: 'landscape',
+    unit: 'pt',
+    format: 'a4'
+  });
+
+  doc.setFont('Helvetica');
+  doc.setFontSize(14);
+  doc.text("جدول المرتبات", 40, 40);
+
+  // اختيار جدول HTML
+  const table = document.querySelector('table');
+
+  const rows = [];
+  const headers = [];
+  table.querySelectorAll('thead th').forEach(th => headers.push(th.innerText.trim()));
+  rows.push(headers);
+
+  table.querySelectorAll('tbody tr').forEach(tr => {
+    const row = [];
+    tr.querySelectorAll('td').forEach(td => row.push(td.innerText.trim()));
+    rows.push(row);
+  });
+
+  // ترسم الجدول يدوياً (مبسط)
+  let startY = 60;
+  const rowHeight = 20;
+  rows.forEach((row, i) => {
+    let x = 40;
+    row.forEach(cell => {
+      doc.text(cell, x, startY + i * rowHeight);
+      x += 80;
+    });
+  });
+
+  doc.save("المرتبات.pdf");
+}
+function exportToExcel() {
+  db.collection('salaries').get().then(snapshot => {
+    const data = [];
+    snapshot.forEach(doc => {
+      const d = doc.data();
+      data.push({
+        'رقم الموظف': d.employeeNumber,
+        'اسم الموظف': d.employeeName,
+        'الوظيفة': d.position,
+        'الراتب': d.salaryAmount,
+        'الخصومات': d.deductions,
+        'الصافي': d.netSalary,
+        'له زيادة؟': d.extraIncrease ? 'نعم' : 'لا',
+      });
+    });
+
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'المرتبات');
+    XLSX.writeFile(wb, 'المرتبات.xlsx');
+  });
+}
+function exportToPDF() {
+  db.collection('salaries').get().then(snapshot => {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    let y = 20;
+
+    doc.setFont('Helvetica', 'bold');
+    doc.setFontSize(16);
+    doc.text('تقرير المرتبات', 105, y, { align: 'center' });
+
+    y += 10;
+    doc.setFontSize(12);
+    snapshot.forEach((docSnap, i) => {
+      const d = docSnap.data();
+      const row = `${i + 1}- ${d.employeeName} | ${d.position} | ${d.salaryAmount} - ${d.deductions} = ${d.netSalary} | زيادة؟ ${d.extraIncrease ? 'نعم' : 'لا'}`;
+      doc.text(row, 10, y);
+      y += 8;
+      if (y > 280) {
+        doc.addPage();
+        y = 20;
+      }
+    });
+
+    doc.save('المرتبات.pdf');
+  });
+}
+window.onload = () => {
+  // ... أكواد التحميل الأخرى مثل loadTableData و loadStats
+
+  document.querySelectorAll('.dropdown > a').forEach(dropdownToggle => {
+    dropdownToggle.addEventListener('click', function(e) {
+      e.preventDefault();
+      const parentLi = this.parentElement;
+      parentLi.classList.toggle('open');
+    });
+  });
+};
+  </script>
+</head>
+<body>
+  <header>
+    <h1>الزامل</h1>
+     <nav>
+        <a href="acc.html">حسابي</a>
+        <a href="login.html" id="logoutBtn">تسجيل الخروج</a>
+      </nav>
+  </header>
+
+  <aside class="sidebar">
+    <ul>
+      <li><a href="index.html">الرئيسية</a></li>
+      <li><a href="The covenant.html">العهدة</a></li>
+
+            <li class="dropdown">
+        <a href="#">حسابات</a>
+        <ul class="submenu">
+          <li><a href="insert.html">حسابات الميناء</a></li>
+          <li><a href="quarry-accounts.html">حسابات المحاجر</a></li>
+        </ul>
+      </li>
+
+      <li><a href="Salaries.html" class="active">المرتبات</a></li>
+      <li><a href="Treasury movement.html">حركة الخزينة</a></li>
+      <li><a href="settings.html">الإعدادات</a></li>
+    </ul>
+  </aside>
+
+  <main>
+    <div class="welcome">مرحبًا بك في لوحة إدارة المرتبات</div>
+
+    <form id="addSalaryForm" onsubmit="addOrUpdateSalary(event)">
+      <label for="employeeNumber">رقم الموظف</label>
+      <input type="number" id="employeeNumber" name="employeeNumber" required min="1" placeholder="أدخل رقم الموظف" />
+
+      <label for="employeeName">اسم الموظف</label>
+      <input type="text" id="employeeName" name="employeeName" required placeholder="أدخل اسم الموظف" />
+
+      <label for="position">الوظيفة</label>
+      <input type="text" id="position" name="position" required placeholder="أدخل الوظيفة" />
+
+      <label for="salaryAmount">المرتب الأساسي (جنيه)</label>
+      <input type="number" id="salaryAmount" name="salaryAmount" required min="0" placeholder="أدخل المرتب" />
+
+      <label for="deductions">الخصم (جنيه)</label>
+      <input type="number" id="deductions" name="deductions" required min="0" placeholder="أدخل الخصم" />
+
+      <div class="extra-increase">
+        <input type="checkbox" id="extraIncrease" name="extraIncrease" />
+        <label for="extraIncrease">له زيادة؟</label>
+      </div>
+
+      <button type="submit" id="submitBtn">إضافة</button>
+    </form>
+
+    <div class="table-header">
+  <h2>قائمة المرتبات</h2>
+  <input type="text" id="searchInput" placeholder="ابحث برقم الموظف..." oninput="searchSalaries()" />
+         
+  <button class="download-btn" onclick="exportToExcel()">تصدير إلى Excel</button>
+  <button class="download-btn" onclick="exportToPDF()">تصدير إلى PDF</button>
+</div>
+
+
+    
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>م</th>
+            <th>رقم الموظف</th>
+            <th>اسم الموظف</th>
+            <th>الوظيفة</th>
+            <th>المرتب (جنيه)</th>
+            <th>الخصم (جنيه)</th>
+            <th>الصافي (جنيه)</th>
+            <th>له زيادة؟</th>
+            <th>إجراءات</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          <tr><td colspan="9">جارٍ تحميل البيانات...</td></tr>
+        </tbody>
+ 
+</div>
+
+      </table>
+    </div>
+  </main>
+
+  <footer>© 2025 الزامل/AL_Zamel</footer>
+</body>
+</html>

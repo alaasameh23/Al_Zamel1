@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+
+  <title>الإعدادات - القائد</title>
+  <link rel="icon" href="assets/engineering-helmet_18031478.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo&display=swap" rel="stylesheet" />
+  <style>
+    @media screen and (max-width: 768px) {
+  /* تحويل الشريط الجانبي (sidebar) إلى شريط أفقي أعلى */
+  .sidebar {
+    position: fixed;
+    top: 70px;
+    left: 0;
+    width: 100%;
+    height: auto;
+    display: flex;
+    overflow-x: auto;
+    padding: 5px 0;
+    background: #1a3b7c;
+    z-index: 1000;
+  }
+
+  .sidebar ul {
+    display: flex;
+    flex-wrap: nowrap;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+  }
+
+  .sidebar ul li {
+    display: inline-block;
+    flex: 0 0 auto;
+  }
+
+  .sidebar ul li a {
+    padding: 10px 15px;
+    border-left: none;
+    border-bottom: 3px solid transparent;
+  }
+
+  .sidebar ul li a.active,
+  .sidebar ul li a:hover {
+    background-color: transparent;
+    border-left: none;
+    border-bottom-color: #aac4ff;
+  }
+
+  /* إزالة الهامش اليمين من المحتوى الرئيسي وتعويضه بمساحة أعلى */
+  main {
+    margin: 0;
+    margin-top: 120px; /* لتحتوي مساحة الشريط الجانبي الأفقي */
+    padding: 20px 15px;
+    min-height: calc(100vh - 120px);
+  }
+
+  /* تغيير تنسيق ترويسة الصفحة عند الشاشات الصغيرة */
+  header {
+    flex-wrap: wrap;
+    padding: 15px 10px;
+  }
+
+  header nav {
+    position: static;
+    transform: none;
+    left: auto;
+    top: auto;
+    margin-bottom: 10px;
+    justify-content: center;
+    width: 100%;
+  }
+
+  header h1 {
+    font-size: 22px;
+  }
+}
+
+    * {
+      box-sizing: border-box;
+      transition: all 0.3s ease;
+    }
+
+    body {
+      font-family: 'Cairo', sans-serif;
+      background: linear-gradient(135deg, #0f2c49, #144b70);
+      color: #e0e7ff;
+      margin: 0;
+      padding: 0 15px 40px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Container */
+    .settings-container {
+      width: 100%;
+      max-width: 480px;
+      margin-top: 50px;
+      background: #12375a;
+      border-radius: 25px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+      padding: 30px 25px 40px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Logo */
+    .logo {
+      width: 110px;
+      height: 110px;
+      background: url('assets/d2345ae6-03df-459d-a534-52ce3097a0b2.jpeg') no-repeat center/contain;
+      margin: 0 auto 25px;
+      filter: drop-shadow(0 0 5px #3fb1ff);
+      animation: pulseLogo 2.5s infinite ease-in-out;
+    }
+
+    @keyframes pulseLogo {
+      0%, 100% {
+        filter: drop-shadow(0 0 8px #3fb1ff);
+        transform: scale(1);
+      }
+      50% {
+        filter: drop-shadow(0 0 18px #67c1ff);
+        transform: scale(1.05);
+      }
+    }
+
+    /* Heading */
+    h2 {
+      font-size: 30px;
+      text-align: center;
+      margin-bottom: 30px;
+      font-weight: 700;
+      color: #d3e0ff;
+      letter-spacing: 1.2px;
+      text-shadow: 0 0 6px #67c1ff;
+    }
+
+    /* Settings Items */
+    .setting-item {
+      background: #1c4f7a;
+      border-radius: 15px;
+      padding: 18px 25px;
+      margin-bottom: 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+      user-select: none;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .setting-item:hover {
+      background: #2a7ecb;
+      box-shadow: 0 8px 20px rgba(42, 126, 203, 0.7);
+      transform: translateY(-3px);
+    }
+
+    .setting-item span {
+      font-size: 20px;
+      font-weight: 600;
+      color: #d0e5ff;
+      user-select: none;
+      z-index: 2;
+    }
+
+    .setting-item .icon {
+      font-size: 26px;
+      color: #97c9ff;
+      animation: pulseIcon 3s infinite ease-in-out;
+      user-select: none;
+      z-index: 2;
+    }
+
+    @keyframes pulseIcon {
+      0%, 100% {
+        color: #97c9ff;
+        transform: scale(1);
+      }
+      50% {
+        color: #cce4ff;
+        transform: scale(1.15);
+      }
+    }
+
+    /* Ripple effect on click */
+    .setting-item:active::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 120%;
+      height: 120%;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      animation: ripple 0.6s forwards;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    @keyframes ripple {
+      to {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0;
+      }
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      inset: 0;
+      background-color: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(4px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-content {
+      background-color: #1c4f7a;
+      border-radius: 18px;
+      padding: 30px 25px;
+      width: 90%;
+      max-width: 400px;
+      color: #e1e9ff;
+      text-align: center;
+      box-shadow: 0 0 20px #2a7ecb;
+      position: relative;
+      transform: translateY(-20px);
+      animation: slideIn 0.4s forwards;
+    }
+
+    @keyframes slideIn {
+      to {
+        transform: translateY(0);
+      }
+    }
+
+    /* Close Button */
+    .close {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      font-size: 30px;
+      font-weight: 700;
+      color: #c3d5ff;
+      cursor: pointer;
+      transition: color 0.3s;
+      user-select: none;
+    }
+
+    .close:hover {
+      color: #ffffff;
+    }
+
+    /* Modal text */
+    .modal-content h3 {
+      font-size: 26px;
+      margin-bottom: 15px;
+      color: #bbdefb;
+      text-shadow: 0 0 8px #7faeff;
+    }
+
+    .modal-content p {
+      font-size: 18px;
+      margin: 10px 0;
+      line-height: 1.5;
+      color: #d0e5ff;
+    }
+
+    .modal-content p strong {
+      color: #a3d0ff;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      .settings-container {
+        padding: 25px 20px 30px;
+      }
+      .setting-item span {
+        font-size: 18px;
+      }
+      .setting-item .icon {
+        font-size: 24px;
+      }
+      .modal-content {
+        padding: 20px 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="settings-container" role="main" aria-label="إعدادات القائد">
+    <!-- Logo -->
+    <div class="logo" aria-label="شعار الشركة" title="شعار القائد"></div>
+
+    <!-- Heading -->
+    <h2>الإعدادات - القائد</h2>
+
+    <!-- Settings Options -->
+    <div class="setting-item" id="contactItem" tabindex="0" role="button" aria-pressed="false" aria-label="تواصل معنا">
+      <span>تواصل معنا</span>
+      <span class="icon" aria-hidden="true">📧</span>
+    </div>
+
+    <div class="setting-item" id="backItem" tabindex="0" role="button" aria-pressed="false" aria-label="الرجوع للخلف">
+      <span>الرجوع للخلف</span>
+      <span class="icon" aria-hidden="true">🔙</span>
+    </div>
+  </div>
+
+  <!-- Contact Modal -->
+  <div id="contactModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-describedby="modalDesc">
+    <div class="modal-content">
+      <span class="close" role="button" aria-label="إغلاق النافذة" tabindex="0">&times;</span>
+      <h3 id="modalTitle">تواصل معنا</h3>
+      <p id="modalDesc">راسلنا عبر البريد:</p>
+      <p><strong>support@alqaeed.com</strong></p>
+      <p>أو اتصل بنا على الرقم:</p>
+      <p><strong>+20 123 456 789</strong></p>
+    </div>
+  </div>
+
+  <script>
+    window.onload = () => {
+      const contactItem = document.getElementById("contactItem");
+      const backItem = document.getElementById("backItem");
+      const contactModal = document.getElementById("contactModal");
+      const closeBtn = document.querySelector(".close");
+
+      // Open modal
+      function openModal() {
+        contactModal.classList.add("show");
+        contactItem.setAttribute('aria-pressed', 'true');
+        // Focus first element in modal
+        closeBtn.focus();
+      }
+
+      // Close modal
+      function closeModal() {
+        contactModal.classList.remove("show");
+        contactItem.setAttribute('aria-pressed', 'false');
+        contactItem.focus();
+      }
+
+      // Go back
+      function goBack() {
+        window.history.back();
+      }
+
+      // Click events
+      contactItem.addEventListener('click', openModal);
+      backItem.addEventListener('click', goBack);
+
+      closeBtn.addEventListener('click', closeModal);
+
+      // Keyboard accessibility
+      contactItem.addEventListener('keydown', e => {
+        if(e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          openModal();
+        }
+      });
+      backItem.addEventListener('keydown', e => {
+        if(e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          goBack();
+        }
+      });
+      closeBtn.addEventListener('keydown', e => {
+        if(e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          closeModal();
+        }
+      });
+
+      // Close modal when clicking outside content
+      window.addEventListener('click', (event) => {
+        if (event.target === contactModal) {
+          closeModal();
+        }
+      });
+
+      // Close modal on Escape key
+      window.addEventListener('keydown', (event) => {
+        if (event.key === "Escape" && contactModal.classList.contains("show")) {
+          closeModal();
+        }
+      });
+    };
+  </script>
+
+</body>
+</html>

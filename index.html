@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <link rel="icon" href="assets/engineering-helmet_18031478.png" />
+  
+  <title>الزامل</title>
+  <style>
+    @media screen and (max-width: 768px) {
+      /* تحويل الشريط الجانبي (sidebar) إلى شريط أفقي أعلى */
+      .sidebar {
+        position: fixed;
+        top: 70px;
+        left: 0;
+        width: 100%;
+        height: auto;
+        display: flex;
+        overflow-x: auto;
+        padding: 5px 0;
+        background: #1a3b7c;
+        z-index: 1000;
+      }
+
+      .sidebar ul {
+        display: flex;
+        flex-wrap: nowrap;
+        width: 100%;
+        padding: 0;
+        margin: 0;
+      }
+
+      .sidebar ul li {
+        display: inline-block;
+        flex: 0 0 auto;
+      }
+
+      .sidebar ul li a {
+        padding: 10px 15px;
+        border-left: none;
+        border-bottom: 3px solid transparent;
+      }
+
+      .sidebar ul li a.active,
+      .sidebar ul li a:hover {
+        background-color: transparent;
+        border-left: none;
+        border-bottom-color: #aac4ff;
+      }
+
+      /* إزالة الهامش اليمين من المحتوى الرئيسي وتعويضه بمساحة أعلى */
+      main {
+        margin: 0;
+        margin-top: 120px; /* لتحتوي مساحة الشريط الجانبي الأفقي */
+        padding: 20px 15px;
+        min-height: calc(100vh - 120px);
+        flex-direction: column;
+      }
+
+      /* تغيير تنسيق ترويسة الصفحة عند الشاشات الصغيرة */
+      header {
+        flex-wrap: wrap;
+        padding: 15px 10px;
+      }
+
+      header nav {
+        position: static;
+        transform: none;
+        left: auto;
+        top: auto;
+        margin-bottom: 10px;
+        justify-content: center;
+        width: 100%;
+      }
+
+      header h1 {
+        font-size: 22px;
+      }
+    }
+
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: #e7f0ff;
+      color: #0b2d70;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    header {
+      background-color: #144a99;
+      padding: 20px;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+
+    header nav {
+      position: absolute;
+      left: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      gap: 15px;
+    }
+
+    header nav a {
+      color: white;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.3s;
+      cursor: pointer;
+    }
+
+    header nav a:hover {
+      color: #85aaff;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 28px;
+      font-weight: 700;
+      user-select: none;
+    }
+
+    .sidebar {
+      width: 210px;
+      background: #1a3b7c;
+      color: white;
+      padding-top: 30px;
+      position: fixed;
+      top: 70px;
+      bottom: 0;
+      overflow-y: auto;
+    }
+
+    .sidebar ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .sidebar ul li {
+      position: relative;
+    }
+
+    .sidebar ul li a {
+      color: white;
+      display: block;
+      padding: 15px 25px;
+      text-decoration: none;
+      font-weight: 600;
+      border-left: 4px solid transparent;
+      transition: background-color 0.3s, border-left-color 0.3s;
+      cursor: pointer;
+    }
+
+    .sidebar ul li a.active,
+    .sidebar ul li a:hover {
+      background-color: #2a509b;
+      border-left-color: #aac4ff;
+    }
+
+    main {
+      margin-right: 210px;
+      padding: 30px 40px;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 40px;
+      position: relative;
+      min-height: calc(100vh - 90px);
+    }
+
+    main::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: url('assets/d2345ae6-03df-459d-a534-52ce3097a0b2.jpeg') center/cover no-repeat;
+      opacity: 0.25;
+      z-index: 0;
+      filter: brightness(0.9);
+      border-radius: 12px;
+    }
+
+    main > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* إضافة تنسيق الفيديو */
+    #myVideo {
+      width: 80%;        /* حجم الفيديو 80% من عرض الحاوية */
+      max-width: 900px;  /* الحد الأقصى للعرض */
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.3);
+      outline: none;
+      user-select: none;
+      cursor: default;
+    }
+    /* صندوق الفيديو */
+    .video-container {
+      flex: 0 0 320px; /* عرض ثابت */
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 0 10px rgba(0,0,0,0.15);
+      background: white;
+    }
+
+    .video-container video {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    /* المحتوى النصي بجانب الفيديو */
+    .content-section {
+      flex: 1;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      max-width: 600px;
+    }
+
+    footer {
+      background-color: #144a99;
+      color: white;
+      text-align: center;
+      padding: 12px 0;
+      font-weight: 600;
+      margin-top: auto;
+    }
+
+    /* سهم صغير بجانب الإدراج */
+    .dropdown > a::after {
+      content: " ▾";
+      font-size: 14px;
+      margin-left: 6px;
+    }
+
+    /* القائمة الفرعية مخفية افتراضياً */
+    .submenu {
+      display: none;
+      list-style: none;
+      padding-left: 0;
+      margin: 0;
+      background-color: #2a509b;
+    }
+
+    .submenu li a {
+      padding: 12px 25px;
+      font-weight: normal;
+      border-left: 4px solid transparent;
+      color: white;
+      display: block;
+      text-decoration: none;
+      transition: background-color 0.3s, border-left-color 0.3s;
+    }
+
+    .submenu li a:hover {
+      background-color: #aac4ff;
+      color: #0b2d70;
+      border-left-color: #0b2d70;
+    }
+
+    /* عند تفعيل القائمة الفرعية تظهر */
+    .dropdown.open > .submenu {
+      display: block;
+    }
+
+    /* تصميم Loading */
+    #loading {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-size: 24px;
+      color: #0b2d70;
+      background-color: #e7f0ff;
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      user-select: none;
+    }
+  </style>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAstL7SQukxHMOEshWXQEuM9Ju9n7UK8TI",
+      authDomain: "lqa2ed.firebaseapp.com",
+      projectId: "lqa2ed",
+      storageBucket: "lqa2ed.firebasestorage.app",
+      messagingSenderId: "677918048293",
+      appId: "1:677918048293:web:9644eab33e4f2df044ffcc"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    document.addEventListener("DOMContentLoaded", function () {
+      // القائمة المنسدلة
+      const dropdown = document.querySelector(".dropdown > a");
+      const dropdownParent = dropdown.parentElement;
+
+      dropdown.addEventListener("click", function (e) {
+        e.preventDefault();
+        dropdownParent.classList.toggle("open");
+      });
+
+      document.addEventListener("click", function (e) {
+        if (!dropdownParent.contains(e.target)) {
+          dropdownParent.classList.remove("open");
+        }
+      });
+
+      // التحقق من تسجيل الدخول
+      auth.onAuthStateChanged(user => {
+        if (!user) {
+          window.location.replace("login.html");
+        } else {
+          document.getElementById("loading").style.display = "none";
+          document.getElementById("content").style.display = "block";
+        }
+      });
+    });
+
+    // تسجيل الخروج
+    function setupLogout() {
+      document.getElementById("logoutBtn").addEventListener("click", function(e) {
+        e.preventDefault();
+        auth.signOut().then(() => {
+          window.location.replace("login.html");
+        });
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", setupLogout);
+  </script>
+</head>
+<body>
+  <div id="loading">جاري التحقق من حالة الدخول...</div>
+
+  <div id="content" style="display:none;">
+    <header>
+      <h1>الزامل</h1>
+      <nav>
+        <a href="acc.html">حسابي</a>
+        <a href="login.html" id="logoutBtn">تسجيل الخروج</a>
+      </nav>
+    </header>
+
+    <aside class="sidebar">
+      <ul>
+        <li><a href="index.html" class="active">الرئيسية</a></li>
+        <li><a href="The covenant.html">العهدة</a></li>
+
+        <li class="dropdown">
+          <a href="#">حسابات</a>
+          <ul class="submenu">
+            <li><a href="insert.html">حسابات الميناء</a></li>
+            <li><a href="quarry-accounts.html">حسابات المحاجر</a></li>
+          </ul>
+        </li>
+
+        <li><a href="Salaries.html">المرتبات</a></li>
+        <li><a href="Treasury movement.html">حركة الخزينة</a></li>
+        <li><a href="settings.html">الإعدادات</a></li>
+      </ul>
+    </aside>
+
+    <main>
+      <!-- مكان الفيديو -->
+      <div class="video-container">
+        <video controls autoplay muted loop>
+          <source src="assets/1.mp4" type="video/mp4" />
+          متصفحك لا يدعم عرض الفيديو.
+        </video>
+      </div>
+
+      <!-- المحتوى النصي -->
+      <section class="content-section">
+        <h2>مرحباً بك في نظام الزامل</h2>
+        <p>يمكنك إدارة حساباتك، الاطلاع على حركة الخزينة، متابعة المرتبات، والمزيد.</p>
+        <p>استخدم القائمة الجانبية للتنقل بين الأقسام.</p>
+        <button onclick="alert('قريباً: إضافة ميزات جديدة!')" style="padding: 10px 20px; background:#1a3b7c; color:#fff; border:none; border-radius:5px; cursor:pointer;">اكتشف المزيد</button>
+      </section>
+    </main>
+
+    <footer>© 2025 الزامل/AL_Zamel</footer>
+  </div>
+</body>
+</html>

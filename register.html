@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+  <link rel="icon" href="assets/engineering-helmet_18031478.png" />
+  <style>
+    body {
+      margin: 0;
+      background: url('assets/brick-wall-background.jpg') no-repeat center center/cover;
+      font-family: 'Poppins', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: #fff;
+      flex-direction: column;
+    }
+    .register-box {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(15px);
+      border-radius: 20px;
+      padding: 40px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      color: #fff;
+      text-align: center;
+    }
+    .input-group {
+      margin-bottom: 15px;
+      text-align: left;
+    }
+    .input-group input,
+    .input-group select {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+      font-size: 14px;
+    }
+    .input-group input::placeholder {
+      color: #ccc;
+    }
+    .register-btn, .lang-toggle {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      background: #fff;
+      color: #000;
+      border: none;
+      border-radius: 10px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .message { margin-top: 10px; min-height: 20px; font-size: 14px; }
+    .success { color: #4caf50; }
+    .error { color: #f44336; }
+    .lang-toggle { margin-bottom: 20px; background: #4caf50; color: white; }
+  </style>
+</head>
+<body>
+
+<div class="register-box">
+  <button class="lang-toggle" onclick="toggleLanguage()">عربي</button>
+  <h2 id="title">Create Account</h2>
+
+  <div class="input-group"><input type="text" id="fullname" placeholder="Full Name"></div>
+  <div class="input-group"><input type="email" id="email" placeholder="Email"></div>
+  <div class="input-group"><input type="tel" id="phone" placeholder="Phone Number"></div>
+  <div class="input-group"><input type="password" id="password" placeholder="Password"></div>
+  <div class="input-group"><input type="password" id="confirmPassword" placeholder="Confirm Password"></div>
+  <div class="input-group"><input type="date" id="birthdate" placeholder="Birth Date"></div>
+  <div class="input-group">
+    <select id="country">
+      <option value="">Select Country</option>
+      <option value="Egypt">Egypt</option>
+      <option value="Saudi Arabia">Saudi Arabia</option>
+      <option value="UAE">UAE</option>
+      <option value="Other">Other</option>
+    </select>
+  </div>
+
+  <button class="register-btn" onclick="registerUser()">Register</button>
+  <div class="message" id="message"></div>
+  <div class="links"><a href="login.html" id="loginLink">Already have an account? Login</a></div>
+</div>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyAstL7SQukxHMOEshWXQEuM9Ju9n7UK8TI",
+    authDomain: "lqa2ed.firebaseapp.com",
+    databaseURL: "https://lqa2ed-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "lqa2ed",
+    storageBucket: "lqa2ed.appspot.com",
+    messagingSenderId: "677918048293",
+    appId: "1:677918048293:web:9644eab33e4f2df044ffcc"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+
+  let currentLang = 'en';
+  const translations = {
+    en: {
+      title: "Create Account",
+      fullname: "Full Name",
+      email: "Email",
+      phone: "Phone Number",
+      password: "Password",
+      confirmPassword: "Confirm Password",
+      birthdate: "Birth Date",
+      country: "Select Country",
+      register: "Register",
+      loginText: "Already have an account? Login",
+      toggle: "عربي"
+    },
+    ar: {
+      title: "إنشاء حساب",
+      fullname: "الاسم الكامل",
+      email: "البريد الإلكتروني",
+      phone: "رقم الهاتف",
+      password: "كلمة المرور",
+      confirmPassword: "تأكيد كلمة المرور",
+      birthdate: "تاريخ الميلاد",
+      country: "اختر الدولة",
+      register: "تسجيل",
+      loginText: "لديك حساب؟ تسجيل دخول",
+      toggle: "English"
+    }
+  };
+
+  function toggleLanguage() {
+    currentLang = currentLang === 'en' ? 'ar' : 'en';
+    const t = translations[currentLang];
+
+    document.documentElement.lang = currentLang;
+    document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+
+    document.getElementById('title').innerText = t.title;
+    document.getElementById('fullname').placeholder = t.fullname;
+    document.getElementById('email').placeholder = t.email;
+    document.getElementById('phone').placeholder = t.phone;
+    document.getElementById('password').placeholder = t.password;
+    document.getElementById('confirmPassword').placeholder = t.confirmPassword;
+    document.getElementById('birthdate').placeholder = t.birthdate;
+    document.getElementById('country').options[0].text = t.country;
+    document.querySelector('.register-btn').innerText = t.register;
+    document.getElementById('loginLink').innerText = t.loginText;
+    document.querySelector('.lang-toggle').innerText = t.toggle;
+  }
+
+  function calculateAge(birthDateStr) {
+    const birthDate = new Date(birthDateStr);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  }
+
+  function registerUser() {
+    const name = document.getElementById('fullname').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    const birthdate = document.getElementById('birthdate').value;
+    const country = document.getElementById('country').value;
+    const messageDiv = document.getElementById('message');
+
+    messageDiv.innerText = '';
+    messageDiv.className = 'message';
+
+    if (!name || !email || !phone || !password || !confirmPassword || !birthdate || !country) {
+      messageDiv.innerText = currentLang === 'ar' ? 'يرجى تعبئة جميع الحقول' : 'Please fill in all fields';
+      messageDiv.classList.add('error');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      messageDiv.innerText = currentLang === 'ar' ? 'كلمتا المرور غير متطابقتين' : 'Passwords do not match';
+      messageDiv.classList.add('error');
+      return;
+    }
+
+    if (password.length < 6) {
+      messageDiv.innerText = currentLang === 'ar' ? 'كلمة المرور يجب أن تكون 6 أحرف على الأقل' : 'Password must be at least 6 characters';
+      messageDiv.classList.add('error');
+      return;
+    }
+
+    const age = calculateAge(birthdate);
+
+    firebase.auth().createUserWithEmailAndPassword(email, password)
+      .then(userCredential => {
+        const user = userCredential.user;
+        return firebase.database().ref('users/' + user.uid).set({
+          fullname: name,
+          email: email,
+          phone: phone,
+          birthdate: birthdate,
+          age: age,
+          country: country
+        });
+      })
+      .then(() => {
+        const user = firebase.auth().currentUser;
+        return user.sendEmailVerification().then(() => {
+          messageDiv.innerText = currentLang === 'ar' ? 'تم إنشاء الحساب! تحقق من بريدك.' : 'Account created! Check your email.';
+          messageDiv.classList.add('success');
+          setTimeout(() => {
+            window.location.href = 'login.html';
+          }, 2000);
+        });
+      })
+      .catch(error => {
+        messageDiv.innerText = error.message;
+        messageDiv.classList.add('error');
+      });
+  }
+</script>
+</body>
+</html>
